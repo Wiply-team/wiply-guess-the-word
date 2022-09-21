@@ -80,7 +80,7 @@ body {
   flex-grow: 0.8;
   grid-template-columns: repeat(5, 4em);
   grid-template-rows: repeat(6, 4em);
-  gap: 0.20em;
+  gap: 0.25em;
 }
 
 .tile {
@@ -96,8 +96,8 @@ body {
   align-items: center;
   user-select: none;
   transition: transform 250ms linear;
-  width: 56px;
-  height: 56px;
+  /* width: 56px;
+  height: 56px; */
 }
 
 .tile[data-state="active"] {
