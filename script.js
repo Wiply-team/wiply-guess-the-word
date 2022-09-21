@@ -43,12 +43,12 @@ window.addEventListener("message", (e) => {
       document.getElementById('title').innerText = gameOptions.wordleTitle
 
 
-      if(gameOptions.difficulty === 'normal'){
-        numTilesToAdd = 10
-      }else if(gameOptions.difficulty === 'easy'){
-        numTilesToAdd = 20
+      // if(gameOptions.difficulty === 'normal'){
+      //   numTilesToAdd = 10
+      // }else if(gameOptions.difficulty === 'easy'){
+      //   numTilesToAdd = 20
 
-      }
+      // }
       const grid = document.getElementsByClassName('guess-grid')[0]
       console.log(grid)
       for(var i = 0; i < numTilesToAdd; i++){
