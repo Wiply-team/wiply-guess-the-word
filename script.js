@@ -40,7 +40,7 @@ window.addEventListener("message", (e) => {
       document.styleSheets[0].cssRules[14].style.setProperty('background', gameOptions.wrongTileColor) // wrong guess-grid
       document.styleSheets[0].cssRules[16].style.setProperty('background', gameOptions.wrongLocationTileColor) // wrong location guess-grid
       document.styleSheets[0].cssRules[17].style.setProperty('background', gameOptions.correctTileColor) // correct guess-grid
-      document.getElementById('title').innerText = gameOptions.wordleTitle
+      document.getElementById('title').innerText = gameOptions.title
 
 
       if(gameOptions.difficulty === 'normal'){
