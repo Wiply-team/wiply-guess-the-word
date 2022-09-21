@@ -47,6 +47,7 @@ window.addEventListener("message", (e) => {
         numTilesToAdd = 10
       }else if(gameOptions.difficulty === 'easy'){
         numTilesToAdd = 20
+
       }
       const grid = document.getElementsByClassName('guess-grid')[0]
       console.log(grid)
@@ -193,7 +194,7 @@ const submitGuess = async () => {
   )
 
   if (!dictionary.includes(guess)) {
-    showAlert("Not in word list")
+    showAlert("Word doesn't exist")
     await shakeTiles(activeTiles)
     return
   }
