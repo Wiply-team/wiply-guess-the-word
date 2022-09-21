@@ -18,7 +18,6 @@ const targetWord = targetWords[Math.floor(dayOffset)]
 
 window.onGameLoaded();
 
-
 window.parent.postMessage(JSON.stringify({ type: "REQUEST_OPTIONS" }), "*");
 
 window.addEventListener("message", (e) => {
@@ -40,7 +39,7 @@ window.addEventListener("message", (e) => {
       document.styleSheets[0].cssRules[14].style.setProperty('background', gameOptions.wrongTileColor) // wrong guess-grid
       document.styleSheets[0].cssRules[16].style.setProperty('background', gameOptions.wrongLocationTileColor) // wrong location guess-grid
       document.styleSheets[0].cssRules[17].style.setProperty('background', gameOptions.correctTileColor) // correct guess-grid
-      document.getElementById('title').innerText = gameOptions.wordleTitle
+      document.getElementById('title').innerText = gameOptions.title
 
 
       // if(gameOptions.difficulty === 'normal'){
@@ -113,7 +112,7 @@ const checkWinLose = (guess, tiles) => {
   console.log(remainingTiles)
   if (remainingTiles.length !== 0) return
   showAlert(targetWord.toUpperCase(), 10000)
-  window.onGameLost()
+  window.onGameLost();
   stopInteraction()
 }
 
