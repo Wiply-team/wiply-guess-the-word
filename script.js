@@ -26,6 +26,17 @@ window.addEventListener("message", (e) => {
     if (message.type === "GAME_OPTIONS") {
       const gameOptions = message.data
       console.log(gameOptions)
+      const isMobile = window?.innerHeight > window?.innerWidth;
+      console.log(isMobile)
+      let guessGrid = document.getElementById('guess-grid')
+      let keyboard = document.getElementById('keyboard')
+      if(isMobile){
+        guessGrid.classList.add('mobile-guess-grid')
+        keyboard.classList.add('mobile-keyboard')
+      }else{
+        guessGrid.classList.add('guess-grid')
+        keyboard.classList.add('keyboard')
+      }
       let numTilesToAdd
       // keyobard property colors 
       document.styleSheets[0].cssRules[4].style.setProperty('background', gameOptions.emptyTileColor) // empty keyboard
