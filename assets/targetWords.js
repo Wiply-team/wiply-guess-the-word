@@ -1,4 +1,4 @@
-export const targetWords = [
+export const englishTargetWords = [
   "cigar",
   "rebut",
   "sissy",

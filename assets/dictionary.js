@@ -1,4 +1,4 @@
-export const dictionary = [
+export const englishDictionary = [
   "aahed",
   "aalii",
   "aargh",

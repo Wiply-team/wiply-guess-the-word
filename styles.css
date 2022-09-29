@@ -219,25 +219,6 @@ body {
   opacity: 0;
 }
 
-/* .mobile-guess-grid {
-  display: grid;
-  justify-content: center;
-  align-content: center;
-  flex-grow: 0.4;
-  grid-template-columns: repeat(5, 7em);
-  grid-template-rows: repeat(6, 7em);
-  gap: 0.5em;
-}
-
-.mobile-keyboard {
-  display: grid;
-  grid-template-columns: repeat(20, minmax(auto, 1.5em));
-  grid-auto-rows: 3em;
-  gap: 0.5em;
-  justify-content: center;
-  margin-bottom: 40px;
-} */
-
 @media screen and (max-width: 600px) {
   .guess-grid {
     flex-grow: 0.4;
@@ -250,6 +231,7 @@ body {
     grid-template-columns: repeat(20, minmax(auto, 1.5em));
     gap: 0.5em;
     margin-bottom: 40px;
+    width: 375px;
   } 
 
 }
