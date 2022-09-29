@@ -1,8 +1,8 @@
 //! Imports
 import { englishDictionary } from "./assets/dictionary.js";
 import { englishTargetWords } from "./assets/targetWords.js";
-import { englishDictionary } from "./assets/dictionarySpanish";
-import { englishTargetWords } from "./assets/targetWordsSpanish";
+import { spanishDictionary } from "./assets/dictionarySpanish";
+import { spanishTargetWords } from "./assets/targetWordsSpanish";
 
 //! Constants
 const WORD_LENGTH = 5;
