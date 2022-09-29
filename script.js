@@ -1,8 +1,8 @@
 //! Imports
 import { englishDictionary } from "./assets/dictionary.js";
 import { englishTargetWords } from "./assets/targetWords.js";
-import { spanishDictionary } from "./assets/dictionarySpanish";
-import { spanishTargetWords } from "./assets/targetWordsSpanish";
+// import { spanishDictionary } from "./assets/dictionarySpanish";
+// import { spanishTargetWords } from "./assets/targetWordsSpanish";
 
 //! Constants
 const WORD_LENGTH = 5;
@@ -76,10 +76,10 @@ window.addEventListener("message", (e) => {
       ); // correct guess-grid
       document.getElementById("title").innerText = gameOptions.wordleTitle;
 
-      if (gameOptions.language === "spanish") {
-         targetWord = spanishTargetWords[Math.floor(dayOffset)]; // changes the target word every day
-         dictionary = spanishDictionary;
-      }
+      // if (gameOptions.language === "spanish") {
+      //    targetWord = spanishTargetWords[Math.floor(dayOffset)]; // changes the target word every day
+      //    dictionary = spanishDictionary;
+      // }
 
       if (gameOptions.difficulty === "normal") {
         numTilesToAdd = 10;
