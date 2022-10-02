@@ -74,7 +74,7 @@ window.addEventListener("message", (e) => {
         "background",
         gameOptions.correctTileColor
       ); // correct guess-grid
-      document.getElementById("title").innerText = gameOptions.wordleTitle;
+      document.getElementById("title").innerText = gameOptions.title;
 
       // if (gameOptions.language === "spanish") {
       //    targetWord = spanishTargetWords[Math.floor(dayOffset)]; // changes the target word every day
@@ -89,15 +89,26 @@ window.addEventListener("message", (e) => {
         document.styleSheets[0].cssRules[10].style.setProperty(
           "grid-template-rows",
           "repeat(8, 3em)"
-        ); // correct guess-grid
+        ); 
         document.styleSheets[0].cssRules[10].style.setProperty(
           "grid-template-columns",
           "repeat(5, 3em)"
-        ); // correct guess-grid
+        ); 
+
+        // adjusts tile size on easy mode since they're 8 rows taking up more space and being played on a mobile device
+        // cssRules[27] is a media query selector and we're accessing the cssRules or that object and set the right property to make it look nice on mobile devices
+        document.styleSheets[0].cssRules[27].cssRules[0].style.setProperty(
+          "grid-template-rows",
+          "repeat(8, 5em)"
+        );
+        document.styleSheets[0].cssRules[27].cssRules[0].style.setProperty(
+          "grid-template-columns",
+          "repeat(5, 5em)"
+        ); 
+        console.log('test')
       }
       const grid = document.getElementsByClassName("guess-grid")[0];
 
-      console.log(grid.className);
       for (var i = 0; i < numTilesToAdd; i++) {
         const tile = document.createElement("div");
         tile.classList.add("tile");
