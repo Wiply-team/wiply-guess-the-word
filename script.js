@@ -13,12 +13,20 @@ const keyboard = document.querySelector("[data-keyboard]");
 const alertContainer = document.querySelector("[data-alert-container]");
 const guessGrid = document.querySelector("[data-guess-grid]");
 //! Variables
-const offsetFromDate = new Date(2022, 0, 1);
-const msOffset = Date.now() - offsetFromDate;
-const dayOffset = msOffset / 1000 / 60 / 60 / 24;
-let targetWord = englishTargetWords[Math.floor(dayOffset)]; // changes the target word every day
-let dictionary = englishDictionary;
 
+// old way of selecting word
+
+// const offsetFromDate = new Date(2022, 0, 1);
+// const msOffset = Date.now() - offsetFromDate;
+// // every day
+// const dayOffset = msOffset / 1000 / 60 / 60 / 24;
+// let targetWord = englishTargetWords[Math.floor(dayOffset)]; // changes the target word every day
+// let dictionary = englishDictionary;
+
+// new way of selecting word
+let randomIndex
+let targetWord
+let timeInterval = 60000
 window.onGameLoaded();
 
 window.parent.postMessage(JSON.stringify({ type: "REQUEST_OPTIONS" }), "*");
@@ -28,9 +36,6 @@ window.addEventListener("message", (e) => {
     const message = JSON.parse(e.data);
     if (message.type === "GAME_OPTIONS") {
       const gameOptions = message.data;
-      console.log(gameOptions);
-
-      console.log(document.styleSheets[0].cssRules);
 
       //  be cautious when updating css style rules on styles.css page as we need to update indices below appropriately if new styles (class names) are added
 
@@ -81,6 +86,25 @@ window.addEventListener("message", (e) => {
       //    dictionary = spanishDictionary;
       // }
 
+      // timeInterval gameOPtions
+
+      // 900000ms == 15 mins
+      // 3.6e+6 == 1 hr
+      // 1.08e+7 == 3hr
+      // 2.88e+7 == 8hr
+      // 8.64e+7 == 1 day
+
+      if (gameOptions.timeInterval === "15 minutes") {
+        timeInterval = 900000;
+      } else if (gameOptions.timeInterval === "1 hour") {
+        timeInterval = 3.6 * 10 ** 6;
+      } else if(gameOptions.timeInterval === "3 hour"){
+        timeInterval = 1.08 * 10 ** 7;
+      } else if(gameOptions.timeInterval === '8 hour'){
+        timeInterval = 2.88 * 10 ** 7;
+      }
+
+      // difficulty gameOptions
       if (gameOptions.difficulty === "normal") {
         numTilesToAdd = 10;
       } else if (gameOptions.difficulty === "easy") {
@@ -89,11 +113,11 @@ window.addEventListener("message", (e) => {
         document.styleSheets[0].cssRules[10].style.setProperty(
           "grid-template-rows",
           "repeat(8, 3em)"
-        ); 
+        );
         document.styleSheets[0].cssRules[10].style.setProperty(
           "grid-template-columns",
           "repeat(5, 3em)"
-        ); 
+        );
 
         // adjusts tile size on easy mode since they're 8 rows taking up more space and being played on a mobile device
         // cssRules[27] is a media query selector and we're accessing the cssRules or that object and set the right property to make it look nice on mobile devices
@@ -104,8 +128,7 @@ window.addEventListener("message", (e) => {
         document.styleSheets[0].cssRules[27].cssRules[0].style.setProperty(
           "grid-template-columns",
           "repeat(5, 5em)"
-        ); 
-        console.log('test')
+        );
       }
       const grid = document.getElementsByClassName("guess-grid")[0];
 
@@ -119,6 +142,49 @@ window.addEventListener("message", (e) => {
     }
   } catch (error) {}
 });
+
+function getCookie(cname) {
+  let name = cname + "=";
+  let decodedCookie = decodeURIComponent(document.cookie);
+  let ca = decodedCookie.split(';');
+  for(let i = 0; i <ca.length; i++) {
+    let c = ca[i];
+    while (c.charAt(0) == ' ') {
+      c = c.substring(1);
+    }
+    if (c.indexOf(name) == 0) {
+      return c.substring(name.length, c.length);
+    }
+  }
+  return "";
+}
+
+if(getCookie('date') == "" && getCookie('index') == ""){
+  document.cookie = 'date=' + new Date().getTime()
+  randomIndex = Math.floor(Math.random() * englishTargetWords.length);
+  document.cookie = 'index=' + randomIndex
+}else{
+  if(new Date().getTime() > timeInterval + Number(getCookie('date'))){
+    document.cookie = 'date=' + new Date().getTime()
+    randomIndex = Math.floor(Math.random() * englishTargetWords.length);
+    document.cookie = 'index=' + randomIndex
+  }else{
+    if(getCookie('index') == ""){
+      randomIndex = Math.floor(Math.random() * englishTargetWords.length);
+      document.cookie = 'index=' + randomIndex
+    }else{
+      randomIndex = Number(getCookie('index'))
+    }
+
+  }
+}
+targetWord = englishTargetWords[randomIndex];
+
+window.setInterval(() => {
+  randomIndex = Math.floor(Math.random() * englishTargetWords.length);
+  targetWord = englishTargetWords[randomIndex];
+}, timeInterval);
+
 
 const getActiveTiles = () =>
   guessGrid.querySelectorAll('[data-state="active"]');
@@ -167,7 +233,6 @@ const checkWinLose = (guess, tiles) => {
   }
 
   const remainingTiles = guessGrid.querySelectorAll(":not([data-letter])");
-  console.log(remainingTiles);
   if (remainingTiles.length !== 0) return;
   showAlert(targetWord.toUpperCase(), 10000);
   window.onGameLost();
@@ -208,9 +273,6 @@ const flipTile = async (tile, index, array, guess) => {
       tile.classList.remove("flip");
       if (targetWord[index] === letter) {
         tile.dataset.state = "correct";
-        // tile.classList.add('active')
-        // document.getElementsByClassName('active').style.backgroundColor = 'red'
-        // console.log(tile)
         key.classList.add("correct");
       } else if (targetWord.includes(letter)) {
         tile.dataset.state = "wrong-location";
