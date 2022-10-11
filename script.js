@@ -24,9 +24,12 @@ const guessGrid = document.querySelector("[data-guess-grid]");
 // let dictionary = englishDictionary;
 
 // new way of selecting word
-let randomIndex
-let targetWord
-let timeInterval = 60000
+let randomIndex;
+let targetWord;
+let timeInterval = 8.64 * 10 ** 7;
+let playerAttempts = 0;
+let dictionary = englishDictionary;
+let outOfScore = 4;
 window.onGameLoaded();
 
 window.parent.postMessage(JSON.stringify({ type: "REQUEST_OPTIONS" }), "*");
@@ -98,17 +101,19 @@ window.addEventListener("message", (e) => {
         timeInterval = 900000;
       } else if (gameOptions.timeInterval === "1 hour") {
         timeInterval = 3.6 * 10 ** 6;
-      } else if(gameOptions.timeInterval === "3 hour"){
+      } else if (gameOptions.timeInterval === "3 hour") {
         timeInterval = 1.08 * 10 ** 7;
-      } else if(gameOptions.timeInterval === '8 hour'){
+      } else if (gameOptions.timeInterval === "8 hour") {
         timeInterval = 2.88 * 10 ** 7;
       }
 
       // difficulty gameOptions
       if (gameOptions.difficulty === "normal") {
         numTilesToAdd = 10;
+        outOfScore = 6;
       } else if (gameOptions.difficulty === "easy") {
         numTilesToAdd = 20;
+        outOfScore = 8;
         // adjust tile size
         document.styleSheets[0].cssRules[10].style.setProperty(
           "grid-template-rows",
@@ -146,10 +151,10 @@ window.addEventListener("message", (e) => {
 function getCookie(cname) {
   let name = cname + "=";
   let decodedCookie = decodeURIComponent(document.cookie);
-  let ca = decodedCookie.split(';');
-  for(let i = 0; i <ca.length; i++) {
+  let ca = decodedCookie.split(";");
+  for (let i = 0; i < ca.length; i++) {
     let c = ca[i];
-    while (c.charAt(0) == ' ') {
+    while (c.charAt(0) == " ") {
       c = c.substring(1);
     }
     if (c.indexOf(name) == 0) {
@@ -159,32 +164,31 @@ function getCookie(cname) {
   return "";
 }
 
-if(getCookie('date') == "" && getCookie('index') == ""){
-  document.cookie = 'date=' + new Date().getTime()
+if (getCookie("date") == "" && getCookie("index") == "") {
+  document.cookie = "date=" + new Date().getTime();
   randomIndex = Math.floor(Math.random() * englishTargetWords.length);
-  document.cookie = 'index=' + randomIndex
-}else{
-  if(new Date().getTime() > timeInterval + Number(getCookie('date'))){
-    document.cookie = 'date=' + new Date().getTime()
+  document.cookie = "index=" + randomIndex;
+} else {
+  if (new Date().getTime() > timeInterval + Number(getCookie("date"))) {
+    document.cookie = "date=" + new Date().getTime();
     randomIndex = Math.floor(Math.random() * englishTargetWords.length);
-    document.cookie = 'index=' + randomIndex
-  }else{
-    if(getCookie('index') == ""){
+    document.cookie = "index=" + randomIndex;
+  } else {
+    if (getCookie("index") == "") {
       randomIndex = Math.floor(Math.random() * englishTargetWords.length);
-      document.cookie = 'index=' + randomIndex
-    }else{
-      randomIndex = Number(getCookie('index'))
+      document.cookie = "index=" + randomIndex;
+    } else {
+      randomIndex = Number(getCookie("index"));
     }
-
   }
 }
 targetWord = englishTargetWords[randomIndex];
+console.log(targetWord);
 
 window.setInterval(() => {
   randomIndex = Math.floor(Math.random() * englishTargetWords.length);
   targetWord = englishTargetWords[randomIndex];
 }, timeInterval);
-
 
 const getActiveTiles = () =>
   guessGrid.querySelectorAll('[data-state="active"]');
@@ -226,14 +230,18 @@ const showAlert = (message, duration = 1000) => {
 const checkWinLose = (guess, tiles) => {
   if (guess === targetWord) {
     showAlert("You win!", 5000);
-    window.onGameWon();
+    window.onGameWon(playerAttempts + 1);
+    document.cookie = "won=true";
     danceTiles(tiles);
     stopInteraction();
     return;
   }
 
   const remainingTiles = guessGrid.querySelectorAll(":not([data-letter])");
-  if (remainingTiles.length !== 0) return;
+  if (remainingTiles.length !== 0) {
+    playerAttempts += 1;
+    return;
+  }
   showAlert(targetWord.toUpperCase(), 10000);
   window.onGameLost();
   stopInteraction();
@@ -349,3 +357,19 @@ function stopInteraction() {
 
 //! Starting the game
 startInteraction();
+
+// if (getCookie("won") === "true") {
+//   console.log("tru");
+//   stopInteraction();
+//   var date = new Date(0);
+//   date.setMilliseconds(
+//     timeInterval + Number(getCookie("date")) - new Date().getTime()
+//   ); // specify value for SECONDS here
+//   console.log(date)
+//   var timeString = date.toISOString().substring(11, 19);
+//   console.log(timeString);
+//   showAlert(
+//     "You already won! Please come back in " + timeString + " to play again",
+//     200000
+//   );
+// }
