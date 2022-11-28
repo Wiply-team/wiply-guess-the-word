@@ -26,7 +26,7 @@ const guessGrid = document.querySelector("[data-guess-grid]");
 // new way of selecting word
 let randomIndex;
 let targetWord;
-let timeInterval = 60000;
+let timeInterval = 8.64 * 10 ** 7;
 let playerAttempts = 0;
 let dictionary = englishDictionary;
 let outOfScore = 4;
@@ -183,13 +183,11 @@ if (getCookie("date") == "" && getCookie("index") == "") {
   }
 }
 targetWord = englishTargetWords[randomIndex];
-// targetWord = "refer";
-// eerie
 
-// window.setInterval(() => {
-//   randomIndex = Math.floor(Math.random() * englishTargetWords.length);
-//   targetWord = englishTargetWords[randomIndex];
-// }, timeInterval);
+window.setInterval(() => {
+  randomIndex = Math.floor(Math.random() * englishTargetWords.length);
+  targetWord = englishTargetWords[randomIndex];
+}, timeInterval);
 
 const getActiveTiles = () =>
   guessGrid.querySelectorAll('[data-state="active"]');
@@ -357,17 +355,6 @@ const state = {
   location: "location",
   correct: "correct",
 };
-
-function countString(str, letter) {
-  // creating regex
-  const re = new RegExp(letter, "g");
-  console.log(re);
-
-  // matching the pattern
-  const count = str.match(re).length;
-
-  return count;
-}
 
 function replaceChar(origString, replaceChar, index) {
   let firstPart = origString.substr(0, index);
