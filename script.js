@@ -26,7 +26,7 @@ const guessGrid = document.querySelector("[data-guess-grid]");
 // new way of selecting word
 let randomIndex;
 let targetWord;
-let timeInterval = 8.64 * 10 ** 7;
+let timeInterval = 60000;
 let playerAttempts = 0;
 let dictionary = englishDictionary;
 let outOfScore = 4;
@@ -183,12 +183,13 @@ if (getCookie("date") == "" && getCookie("index") == "") {
   }
 }
 targetWord = englishTargetWords[randomIndex];
-console.log(targetWord);
+// targetWord = "refer";
+// eerie
 
-window.setInterval(() => {
-  randomIndex = Math.floor(Math.random() * englishTargetWords.length);
-  targetWord = englishTargetWords[randomIndex];
-}, timeInterval);
+// window.setInterval(() => {
+//   randomIndex = Math.floor(Math.random() * englishTargetWords.length);
+//   targetWord = englishTargetWords[randomIndex];
+// }, timeInterval);
 
 const getActiveTiles = () =>
   guessGrid.querySelectorAll('[data-state="active"]');
@@ -267,7 +268,7 @@ const deleteKey = () => {
 
 document.getElementById("deleteKey").addEventListener("click", deleteKey, true);
 
-const flipTile = async (tile, index, array, guess) => {
+const flipTile = async (tile, index, array, guess, tileState) => {
   const letter = tile.dataset.letter;
   const key = keyboard.querySelector(`[data-key="${letter}"i]`);
   setTimeout(
@@ -279,17 +280,33 @@ const flipTile = async (tile, index, array, guess) => {
     "transitionend",
     () => {
       tile.classList.remove("flip");
-      if (targetWord[index] === letter) {
+      if (tileState === "correct") {
+        key.classList.remove("wrong");
+        key.classList.remove("wrong-location");
         tile.dataset.state = "correct";
         key.classList.add("correct");
-      } else if (targetWord.includes(letter)) {
-        tile.dataset.state = "wrong-location";
-        key.classList.add("wrong-location");
+      } else if (tileState == "location") {
+        if (!key.classList.contains("correct")) {
+          tile.dataset.state = "wrong-location";
+          key.classList.add("wrong-location");
+        }
       } else {
-        tile.dataset.state = "wrong";
-        key.classList.add("wrong");
+        if (
+          !key.classList.contains("correct") &&
+          !key.classList.contains("wrong-location")
+        ) {
+          tile.dataset.state = "wrong";
+          key.classList.add("wrong");
+        }
       }
 
+      if (tileState === "correct") {
+        tile.dataset.state = "correct";
+      } else if (tileState == "location") {
+        tile.dataset.state = "wrong-location";
+      } else {
+        tile.dataset.state = "wrong";
+      }
       if (index !== array.length - 1) return;
       tile.addEventListener(
         "transitionend",
@@ -324,8 +341,67 @@ const submitGuess = async () => {
   }
 
   stopInteraction();
-  activeTiles.forEach((...params) => flipTile(...params, guess));
+
+  const result = markTileState(guess);
+  console.log(activeTiles);
+  var i = 0;
+  console.log(result);
+  activeTiles.forEach((...params) => {
+    flipTile(...params, guess, result[i]);
+    i++;
+  });
 };
+
+const state = {
+  wrong: "Wrong",
+  location: "location",
+  correct: "correct",
+};
+
+function countString(str, letter) {
+  // creating regex
+  const re = new RegExp(letter, "g");
+  console.log(re);
+
+  // matching the pattern
+  const count = str.match(re).length;
+
+  return count;
+}
+
+function replaceChar(origString, replaceChar, index) {
+  let firstPart = origString.substr(0, index);
+  let lastPart = origString.substr(index + 1);
+
+  let newString = firstPart + replaceChar + lastPart;
+  return newString;
+}
+
+function markTileState(guess) {
+  // checks correct
+  var temp = targetWord;
+  var toReturn = [null, null, null, null, null];
+  for (var i = 0; i < 5; i++) {
+    if (guess[i] === temp[i]) {
+      toReturn[i] = state["correct"];
+      temp = replaceChar(temp, " ", i);
+      guess = replaceChar(guess, " ", i);
+    }
+  }
+
+  for (var i = 0; i < 5; i++) {
+    if (guess[i] !== " ") {
+      let index = temp.indexOf(guess[i]);
+      if (index != -1) {
+        temp = replaceChar(temp, " ", index);
+        toReturn[i] = state["location"];
+      } else {
+        toReturn[i] = state["wrong"];
+      }
+    }
+  }
+  return toReturn;
+}
 
 function handleMouseClick({ target }) {
   target.matches("[data-key]")
