@@ -245,10 +245,10 @@ const checkWinLose = (guess, tiles) => {
     var seconds = getDifferenceInSeconds(today,today2)
     if (minutes > 0) {
       const temp = minutes*30 + seconds * 2 + outOfScore*2 ;
-      score = 1000-temp
+      score = 10000-temp
     }else {
      const temp = secodes*3 + outOfScore*2;
-     score = 1000 - temp;
+     score = 10000 - temp;
     }
     window.onGameWon(Math.trunc(score));
     document.cookie = "won=true";
