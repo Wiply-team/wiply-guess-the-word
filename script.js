@@ -250,7 +250,7 @@ const checkWinLose = (guess, tiles) => {
      const temp = secodes*3 + outOfScore*2;
      score = 1000 - temp;
     }
-    window.onGameWon(score);
+    window.onGameWon(Math.trunc(score));
     document.cookie = "won=true";
     danceTiles(tiles);
     stopInteraction();
