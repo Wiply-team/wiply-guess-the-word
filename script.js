@@ -30,6 +30,18 @@ let timeInterval = 8.64 * 10 ** 7;
 let playerAttempts = 0;
 let dictionary = englishDictionary;
 let outOfScore = 4;
+let score = 0;
+var today = new Date();
+var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+function getDifferenceInMinutes(date1, date2) {
+  const diffInMs = Math.abs(date2 - date1);
+  return diffInMs / (1000 * 60);
+}
+function getDifferenceInSeconds(date1, date2) {
+  const diffInMs = Math.abs(date2 - date1);
+  return diffInMs / 1000;
+}
+
 window.onGameLoaded();
 
 window.parent.postMessage(JSON.stringify({ type: "REQUEST_OPTIONS" }), "*");
@@ -228,8 +240,17 @@ const showAlert = (message, duration = 1000) => {
 
 const checkWinLose = (guess, tiles) => {
   if (guess === targetWord) {
-    showAlert("You win!", 5000);
-    window.onGameWon(playerAttempts + 1);
+    var today2 = new Date();
+    var minutes = getDifferenceInMinutes(today,today2)
+    var seconds = getDifferenceInSeconds(today,today2)
+    if (minutes > 0) {
+      const temp = minutes*30 + seconds * 2 + outOfScore*2 ;
+      score = 1000-temp
+    }else {
+     const temp = secodes*3 + outOfScore*2;
+     score = 1000 - temp;
+    }
+    window.onGameWon(score);
     document.cookie = "won=true";
     danceTiles(tiles);
     stopInteraction();
