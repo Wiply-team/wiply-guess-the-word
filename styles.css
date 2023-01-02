@@ -254,3 +254,20 @@ body {
 .mobile{
   display: none;
 }
+
+@media screen and (max-width: 600px) {
+  .web {
+    display: none;
+  }
+  .mobile {
+    display: flex;
+    width: 80%;
+    height: 35px;
+  }
+  .key.large {
+    grid-column: span 6;
+  }
+  .key{
+    font-size: 13px;
+  }
+}
