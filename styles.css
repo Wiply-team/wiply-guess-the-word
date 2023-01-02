@@ -232,23 +232,7 @@ body {
   .keyboard {
     grid-template-columns: repeat(20, minmax(auto, 1.5em));
     gap: 0.5em;
-    margin-bottom: 5px !important;
+    margin-bottom: 40px;
     width: 375px;
-    max-width: 100vw;
-    grid-auto-rows: 4.5em;
-  }
-  .web {
-    display: none;
-  }
-  .mobile {
-    display: flex;
-    width: 80%;
-    height: 35px;
-  }
-  .key.large {
-    grid-column: span 6;
-  }
-  .key{
-    font-size: 13px;
   }
 }
