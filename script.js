@@ -135,20 +135,21 @@ window.addEventListener("message", (e) => {
           "grid-template-columns",
           "repeat(5, 3em)"
         );
+        console.log(numTilesToAdd)
 
         // adjusts tile size on easy mode since they're 8 rows taking up more space and being played on a mobile device
         // cssRules[27] is a media query selector and we're accessing the cssRules or that object and set the right property to make it look nice on mobile devices
-        document.styleSheets[0].cssRules[27].cssRules[0].style.setProperty(
-          "grid-template-rows",
-          "repeat(8, 5em)"
-        );
-        document.styleSheets[0].cssRules[27].cssRules[0].style.setProperty(
-          "grid-template-columns",
-          "repeat(5, 5em)"
-        );
+        // document.styleSheets[0].cssRules[27].cssRules[0].style.setProperty(
+        //   "grid-template-rows",
+        //   "repeat(8, 5em)"
+        // );
+        // document.styleSheets[0].cssRules[27].cssRules[0].style.setProperty(
+        //   "grid-template-columns",
+        //   "repeat(5, 5em)"
+        // );
       }
       const grid = document.getElementsByClassName("guess-grid")[0];
-
+      console.log(numTilesToAdd)
       for (var i = 0; i < numTilesToAdd; i++) {
         const tile = document.createElement("div");
         tile.classList.add("tile");
