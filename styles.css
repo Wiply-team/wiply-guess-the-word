@@ -232,7 +232,6 @@ body {
     gap: 0.5em;
     width: 375px;
     margin-bottom: 5px !important;
-
     max-width: 100vw;
     grid-auto-rows: 4.5em;
   }
@@ -261,7 +260,7 @@ body {
   }
   .mobile {
     display: flex;
-    width: 80%;
+    width: 50%;
     height: 35px;
   }
   .key.large {
@@ -269,5 +268,13 @@ body {
   }
   .key{
     font-size: 13px;
+  }
+  .enterButton{
+    display: flex;
+    width: 100%;
+    justify-content: flex-end;
+    width: 375px;
+    max-width: 100vw;
+
   }
 }
