@@ -57,7 +57,6 @@ window.addEventListener("message", (e) => {
       const gameOptions = message.data;
       //lang
       if (gameOptions?.language === "heb") {
-        sessionStorage.setItem("lang", gameOptions?.language);
         document.styleSheets[0].cssRules[29].style.setProperty(
           "display",
           "none"
@@ -70,8 +69,6 @@ window.addEventListener("message", (e) => {
           "direction",
           "rtl"
         );
-      } else {
-        sessionStorage.removeItem("lang");
       }
 
       //  be cautious when updating css style rules on styles.css page as we need to update indices below appropriately if new styles (class names) are added
@@ -192,7 +189,7 @@ window.addEventListener("message", (e) => {
         }
         return "";
       }
-      if (sessionStorage.getItem("lang") === "heb") {
+      if (gameOptions?.language === "heb") {
         targetWord =
           hebrewTargetWords[
             Math.floor(Math.random() * hebrewTargetWords.length)
@@ -381,7 +378,7 @@ window.addEventListener("message", (e) => {
       const submitGuess = async () => {
         const activeTiles = [...getActiveTiles()];
         if (activeTiles.length !== WORD_LENGTH) {
-          if (sessionStorage.getItem("lang") === "heb") {
+          if (gameOptions?.language === "heb") {
             showAlert("אין מספיק תווים");
           } else {
             showAlert("Not enough letters");
@@ -396,7 +393,7 @@ window.addEventListener("message", (e) => {
         );
 
         if (!dictionary.includes(guess)) {
-          if (sessionStorage.getItem("lang") === "heb") {
+          if (gameOptions?.language === "heb") {
             showAlert("המילה לא קיימת");
           } else {
             showAlert("Word doesn't exist");
@@ -466,7 +463,7 @@ window.addEventListener("message", (e) => {
       }
 
       function handleKeyPress({ key }) {
-        if (sessionStorage.getItem("lang") === "heb") {
+        if (gameOptions?.language === "heb") {
           key === "Enter"
             ? submitGuess()
             : key === "Backspace"
