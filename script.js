@@ -55,22 +55,21 @@ window.addEventListener("message", (e) => {
     const message = JSON.parse(e.data);
     if (message.type === "GAME_OPTIONS") {
       const gameOptions = message.data;
-
       //lang
       if (gameOptions?.language === "heb") {
         sessionStorage.setItem("lang", gameOptions?.language);
         document.styleSheets[0].cssRules[29].style.setProperty(
           "display",
           "none"
-          );          
-          document.styleSheets[0].cssRules[30].style.setProperty(
-            "display",
+        );
+        document.styleSheets[0].cssRules[30].style.setProperty(
+          "display",
           "flex"
-          );
+        );
         document.styleSheets[0].cssRules[10].style.setProperty(
           "direction",
           "rtl"
-          );
+        );
       } else {
         sessionStorage.removeItem("lang");
       }
@@ -178,335 +177,344 @@ window.addEventListener("message", (e) => {
         grid.appendChild(tile);
       }
 
+      function getCookie(cname) {
+        let name = cname + "=";
+        let decodedCookie = decodeURIComponent(document.cookie);
+        let ca = decodedCookie.split(";");
+        for (let i = 0; i < ca.length; i++) {
+          let c = ca[i];
+          while (c.charAt(0) == " ") {
+            c = c.substring(1);
+          }
+          if (c.indexOf(name) == 0) {
+            return c.substring(name.length, c.length);
+          }
+        }
+        return "";
+      }
+      if (sessionStorage.getItem("lang") === "heb") {
+        targetWord =
+          hebrewTargetWords[
+            Math.floor(Math.random() * hebrewTargetWords.length)
+          ];
+        dictionary = hebrewDictionary;
+        window.setInterval(() => {
+          randomIndex = Math.floor(Math.random() * hebrewTargetWords.length);
+          targetWord = hebrewTargetWords[randomIndex];
+        }, timeInterval);
+      } else {
+        if (getCookie("date") == "" && getCookie("index") == "") {
+          document.cookie = "date=" + new Date().getTime();
+          randomIndex = Math.floor(Math.random() * englishTargetWords.length);
+          document.cookie = "index=" + randomIndex;
+        } else {
+          if (new Date().getTime() > timeInterval + Number(getCookie("date"))) {
+            document.cookie = "date=" + new Date().getTime();
+            randomIndex = Math.floor(Math.random() * englishTargetWords.length);
+            document.cookie = "index=" + randomIndex;
+          } else {
+            if (getCookie("index") == "") {
+              randomIndex = Math.floor(
+                Math.random() * englishTargetWords.length
+              );
+              document.cookie = "index=" + randomIndex;
+            } else {
+              randomIndex = Number(getCookie("index"));
+            }
+          }
+        }
+        targetWord = englishTargetWords[randomIndex];
+        window.setInterval(() => {
+          randomIndex = Math.floor(Math.random() * englishTargetWords.length);
+          targetWord = englishTargetWords[randomIndex];
+        }, timeInterval);
+      }
+      sessionStorage.setItem(
+        "gsdjgsj",
+        "gdss542gsdav2379bfsyn9fsndsds0" + targetWord + "0jnosahgiuaoshgiauasg"
+      );
+
+      const getActiveTiles = () =>
+        guessGrid.querySelectorAll('[data-state="active"]');
+
+      const danceTiles = async (tiles) =>
+        await tiles.forEach((tile, index) => {
+          setTimeout(() => {
+            tile.classList.add("dance");
+            tile.addEventListener(
+              "animationend",
+              () => tile.classList.remove("dance"),
+              { once: true }
+            );
+          }, (index * DANCE_ANIMATION_DURATION) / 5);
+        });
+
+      const shakeTiles = async (tiles) =>
+        await tiles.forEach((tile) => {
+          tile.classList.add("shake");
+          tile.addEventListener(
+            "animationend",
+            () => tile.classList.remove("shake"),
+            { once: true }
+          );
+        });
+
+      const showAlert = (message, duration = 1000) => {
+        const alert = document.createElement("div");
+        alert.textContent = message;
+        alert.classList.add("alert");
+        alertContainer.prepend(alert);
+
+        setTimeout(() => {
+          alert.classList.add("hide");
+          alert.addEventListener("transitionend", () => alert.remove());
+        }, duration);
+      };
+
+      const checkWinLose = (guess, tiles) => {
+        if (guess === targetWord) {
+          var today2 = new Date();
+          var minutes = getDifferenceInMinutes(today, today2);
+          var seconds = getDifferenceInSeconds(today, today2);
+          if (minutes > 0) {
+            const temp = minutes * 30 + seconds * 2 + outOfScore * 2;
+            score = 10000 - temp;
+          } else {
+            const temp = secodes * 3 + outOfScore * 2;
+            score = 10000 - temp;
+          }
+          window.onGameWon(Math.trunc(score));
+          document.cookie = "won=true";
+          danceTiles(tiles);
+          stopInteraction();
+          return;
+        }
+
+        const remainingTiles = guessGrid.querySelectorAll(
+          ":not([data-letter])"
+        );
+        if (remainingTiles.length !== 0) {
+          playerAttempts += 1;
+          return;
+        }
+        showAlert(targetWord.toUpperCase(), 10000);
+        window.onGameLost();
+        stopInteraction();
+      };
+
+      const pressKey = (key) => {
+        const activeTiles = getActiveTiles();
+        if (activeTiles.length >= WORD_LENGTH) return;
+        const nextTile = guessGrid.querySelector(":not([data-letter])");
+        nextTile.dataset.letter = key.toLowerCase();
+        nextTile.textContent = key;
+        nextTile.dataset.state = "active";
+      };
+
+      const deleteKey = () => {
+        const activeTiles = getActiveTiles();
+        const lastTile = activeTiles[activeTiles.length - 1];
+        if (lastTile == null) return;
+        lastTile.textContent = "";
+        delete lastTile.dataset.state;
+        delete lastTile.dataset.letter;
+      };
+
+      document
+        .getElementById("deleteKey")
+        .addEventListener("click", deleteKey, true);
+      // document.getElementById("deleteKeyheb").addEventListener("click", deleteKey, true);
+
+      const flipTile = async (tile, index, array, guess, tileState) => {
+        const letter = tile.dataset.letter;
+        const key = keyboard.querySelector(`[data-key="${letter}"i]`);
+        setTimeout(
+          () => tile.classList.add("flip"),
+          (index * FLIP_ANIMATION_DURATION) / 2
+        );
+
+        await tile.addEventListener(
+          "transitionend",
+          () => {
+            tile.classList.remove("flip");
+            if (tileState === "correct") {
+              key.classList.remove("wrong");
+              key.classList.remove("wrong-location");
+              tile.dataset.state = "correct";
+              key.classList.add("correct");
+            } else if (tileState == "location") {
+              if (!key.classList.contains("correct")) {
+                tile.dataset.state = "wrong-location";
+                key.classList.add("wrong-location");
+              }
+            } else {
+              if (
+                !key.classList.contains("correct") &&
+                !key.classList.contains("wrong-location")
+              ) {
+                tile.dataset.state = "wrong";
+                key.classList.add("wrong");
+              }
+            }
+
+            if (tileState === "correct") {
+              tile.dataset.state = "correct";
+            } else if (tileState == "location") {
+              tile.dataset.state = "wrong-location";
+            } else {
+              tile.dataset.state = "wrong";
+            }
+            if (index !== array.length - 1) return;
+            tile.addEventListener(
+              "transitionend",
+              () => {
+                startInteraction();
+                checkWinLose(guess, array);
+              },
+              { once: true }
+            );
+          },
+          { once: true }
+        );
+      };
+
+      const submitGuess = async () => {
+        const activeTiles = [...getActiveTiles()];
+        if (activeTiles.length !== WORD_LENGTH) {
+          if (sessionStorage.getItem("lang") === "heb") {
+            showAlert("אין מספיק תווים");
+          } else {
+            showAlert("Not enough letters");
+          }
+          await shakeTiles(activeTiles);
+          return;
+        }
+
+        const guess = activeTiles.reduce(
+          (word, tile) => word + tile.dataset.letter,
+          ""
+        );
+
+        if (!dictionary.includes(guess)) {
+          if (sessionStorage.getItem("lang") === "heb") {
+            showAlert("המילה לא קיימת");
+          } else {
+            showAlert("Word doesn't exist");
+          }
+          await shakeTiles(activeTiles);
+          return;
+        }
+
+        stopInteraction();
+
+        const result = markTileState(guess);
+        console.log(activeTiles);
+        var i = 0;
+        console.log(result);
+        activeTiles.forEach((...params) => {
+          flipTile(...params, guess, result[i]);
+          i++;
+        });
+      };
+
+      const state = {
+        wrong: "Wrong",
+        location: "location",
+        correct: "correct",
+      };
+
+      function replaceChar(origString, replaceChar, index) {
+        let firstPart = origString.substr(0, index);
+        let lastPart = origString.substr(index + 1);
+
+        let newString = firstPart + replaceChar + lastPart;
+        return newString;
+      }
+
+      function markTileState(guess) {
+        // checks correct
+        var temp = targetWord;
+        var toReturn = [null, null, null, null, null];
+        for (var i = 0; i < 5; i++) {
+          if (guess[i] === temp[i]) {
+            toReturn[i] = state["correct"];
+            temp = replaceChar(temp, " ", i);
+            guess = replaceChar(guess, " ", i);
+          }
+        }
+
+        for (var i = 0; i < 5; i++) {
+          if (guess[i] !== " ") {
+            let index = temp.indexOf(guess[i]);
+            if (index != -1) {
+              temp = replaceChar(temp, " ", index);
+              toReturn[i] = state["location"];
+            } else {
+              toReturn[i] = state["wrong"];
+            }
+          }
+        }
+        return toReturn;
+      }
+
+      function handleMouseClick({ target }) {
+        target.matches("[data-key]")
+          ? pressKey(target.dataset.key)
+          : target.matches("[data-enter]")
+          ? submitGuess()
+          : null;
+      }
+
+      function handleKeyPress({ key }) {
+        if (sessionStorage.getItem("lang") === "heb") {
+          key === "Enter"
+            ? submitGuess()
+            : key === "Backspace"
+            ? deleteKey()
+            : key.match(/^[א-ת]$/)
+            ? pressKey(key)
+            : null;
+        } else {
+          key === "Enter"
+            ? submitGuess()
+            : key === "Backspace"
+            ? deleteKey()
+            : key.match(/^[a-zA-Z]$/)
+            ? pressKey(key)
+            : null;
+        }
+      }
+
+      function startInteraction() {
+        document.addEventListener("click", handleMouseClick);
+        document.addEventListener("keydown", handleKeyPress);
+      }
+
+      function stopInteraction() {
+        document.removeEventListener("click", handleMouseClick);
+        document.removeEventListener("keydown", handleKeyPress);
+      }
+
+      //! Starting the game
+      startInteraction();
+
+      // if (getCookie("won") === "true") {
+      //   console.log("tru");
+      //   stopInteraction();
+      //   var date = new Date(0);
+      //   date.setMilliseconds(
+      //     timeInterval + Number(getCookie("date")) - new Date().getTime()
+      //   ); // specify value for SECONDS here
+      //   console.log(date)
+      //   var timeString = date.toISOString().substring(11, 19);
+      //   console.log(timeString);
+      //   showAlert(
+      //     "You already won! Please come back in " + timeString + " to play again",
+      //     200000
+      //   );
+      // }
+
       return;
     }
   } catch (error) {}
 });
-
-function getCookie(cname) {
-  let name = cname + "=";
-  let decodedCookie = decodeURIComponent(document.cookie);
-  let ca = decodedCookie.split(";");
-  for (let i = 0; i < ca.length; i++) {
-    let c = ca[i];
-    while (c.charAt(0) == " ") {
-      c = c.substring(1);
-    }
-    if (c.indexOf(name) == 0) {
-      return c.substring(name.length, c.length);
-    }
-  }
-  return "";
-}
-if (sessionStorage.getItem("lang") === "heb") {
-  targetWord =
-    hebrewTargetWords[Math.floor(Math.random() * hebrewTargetWords.length)];
-  dictionary = hebrewDictionary;
-  window.setInterval(() => {
-    randomIndex = Math.floor(Math.random() * hebrewTargetWords.length);
-    targetWord = hebrewTargetWords[randomIndex];
-  }, timeInterval);
-} else {
-  if (getCookie("date") == "" && getCookie("index") == "") {
-    document.cookie = "date=" + new Date().getTime();
-    randomIndex = Math.floor(Math.random() * englishTargetWords.length);
-    document.cookie = "index=" + randomIndex;
-  } else {
-    if (new Date().getTime() > timeInterval + Number(getCookie("date"))) {
-      document.cookie = "date=" + new Date().getTime();
-      randomIndex = Math.floor(Math.random() * englishTargetWords.length);
-      document.cookie = "index=" + randomIndex;
-    } else {
-      if (getCookie("index") == "") {
-        randomIndex = Math.floor(Math.random() * englishTargetWords.length);
-        document.cookie = "index=" + randomIndex;
-      } else {
-        randomIndex = Number(getCookie("index"));
-      }
-    }
-  }
-  targetWord = englishTargetWords[randomIndex];
-  window.setInterval(() => {
-    randomIndex = Math.floor(Math.random() * englishTargetWords.length);
-    targetWord = englishTargetWords[randomIndex];
-  }, timeInterval);
-}
-sessionStorage.setItem(
-  "gsdjgsj",
-  "gdss542gsdav2379bfsyn9fsndsds0" + targetWord + "0jnosahgiuaoshgiauasg"
-);
-const getActiveTiles = () =>
-  guessGrid.querySelectorAll('[data-state="active"]');
-
-const danceTiles = async (tiles) =>
-  await tiles.forEach((tile, index) => {
-    setTimeout(() => {
-      tile.classList.add("dance");
-      tile.addEventListener(
-        "animationend",
-        () => tile.classList.remove("dance"),
-        { once: true }
-      );
-    }, (index * DANCE_ANIMATION_DURATION) / 5);
-  });
-
-const shakeTiles = async (tiles) =>
-  await tiles.forEach((tile) => {
-    tile.classList.add("shake");
-    tile.addEventListener(
-      "animationend",
-      () => tile.classList.remove("shake"),
-      { once: true }
-    );
-  });
-
-const showAlert = (message, duration = 1000) => {
-  const alert = document.createElement("div");
-  alert.textContent = message;
-  alert.classList.add("alert");
-  alertContainer.prepend(alert);
-
-  setTimeout(() => {
-    alert.classList.add("hide");
-    alert.addEventListener("transitionend", () => alert.remove());
-  }, duration);
-};
-
-const checkWinLose = (guess, tiles) => {
-  if (guess === targetWord) {
-    var today2 = new Date();
-    var minutes = getDifferenceInMinutes(today, today2);
-    var seconds = getDifferenceInSeconds(today, today2);
-    if (minutes > 0) {
-      const temp = minutes * 30 + seconds * 2 + outOfScore * 2;
-      score = 10000 - temp;
-    } else {
-      const temp = secodes * 3 + outOfScore * 2;
-      score = 10000 - temp;
-    }
-    window.onGameWon(Math.trunc(score));
-    document.cookie = "won=true";
-    danceTiles(tiles);
-    stopInteraction();
-    return;
-  }
-
-  const remainingTiles = guessGrid.querySelectorAll(":not([data-letter])");
-  if (remainingTiles.length !== 0) {
-    playerAttempts += 1;
-    return;
-  }
-  showAlert(targetWord.toUpperCase(), 10000);
-  window.onGameLost();
-  stopInteraction();
-};
-
-const pressKey = (key) => {
-  const activeTiles = getActiveTiles();
-  if (activeTiles.length >= WORD_LENGTH) return;
-  const nextTile = guessGrid.querySelector(":not([data-letter])");
-  nextTile.dataset.letter = key.toLowerCase();
-  nextTile.textContent = key;
-  nextTile.dataset.state = "active";
-};
-
-const deleteKey = () => {
-  const activeTiles = getActiveTiles();
-  const lastTile = activeTiles[activeTiles.length - 1];
-  if (lastTile == null) return;
-  lastTile.textContent = "";
-  delete lastTile.dataset.state;
-  delete lastTile.dataset.letter;
-};
-
-document.getElementById("deleteKey").addEventListener("click", deleteKey, true);
-// document.getElementById("deleteKeyheb").addEventListener("click", deleteKey, true);
-
-const flipTile = async (tile, index, array, guess, tileState) => {
-  const letter = tile.dataset.letter;
-  const key = keyboard.querySelector(`[data-key="${letter}"i]`);
-  setTimeout(
-    () => tile.classList.add("flip"),
-    (index * FLIP_ANIMATION_DURATION) / 2
-  );
-
-  await tile.addEventListener(
-    "transitionend",
-    () => {
-      tile.classList.remove("flip");
-      if (tileState === "correct") {
-        key.classList.remove("wrong");
-        key.classList.remove("wrong-location");
-        tile.dataset.state = "correct";
-        key.classList.add("correct");
-      } else if (tileState == "location") {
-        if (!key.classList.contains("correct")) {
-          tile.dataset.state = "wrong-location";
-          key.classList.add("wrong-location");
-        }
-      } else {
-        if (
-          !key.classList.contains("correct") &&
-          !key.classList.contains("wrong-location")
-        ) {
-          tile.dataset.state = "wrong";
-          key.classList.add("wrong");
-        }
-      }
-
-      if (tileState === "correct") {
-        tile.dataset.state = "correct";
-      } else if (tileState == "location") {
-        tile.dataset.state = "wrong-location";
-      } else {
-        tile.dataset.state = "wrong";
-      }
-      if (index !== array.length - 1) return;
-      tile.addEventListener(
-        "transitionend",
-        () => {
-          startInteraction();
-          checkWinLose(guess, array);
-        },
-        { once: true }
-      );
-    },
-    { once: true }
-  );
-};
-
-const submitGuess = async () => {
-  const activeTiles = [...getActiveTiles()];
-  if (activeTiles.length !== WORD_LENGTH) {
-    if (sessionStorage.getItem("lang") === "heb") {
-      showAlert("אין מספיק תווים");
-    } else {
-      showAlert("Not enough letters");
-    }
-    await shakeTiles(activeTiles);
-    return;
-  }
-
-  const guess = activeTiles.reduce(
-    (word, tile) => word + tile.dataset.letter,
-    ""
-  );
-
-  if (!dictionary.includes(guess)) {
-    if (sessionStorage.getItem("lang") === "heb") {
-      showAlert("המילה לא קיימת");
-    } else {
-      showAlert("Word doesn't exist");
-    }
-    await shakeTiles(activeTiles);
-    return;
-  }
-
-  stopInteraction();
-
-  const result = markTileState(guess);
-  console.log(activeTiles);
-  var i = 0;
-  console.log(result);
-  activeTiles.forEach((...params) => {
-    flipTile(...params, guess, result[i]);
-    i++;
-  });
-};
-
-const state = {
-  wrong: "Wrong",
-  location: "location",
-  correct: "correct",
-};
-
-function replaceChar(origString, replaceChar, index) {
-  let firstPart = origString.substr(0, index);
-  let lastPart = origString.substr(index + 1);
-
-  let newString = firstPart + replaceChar + lastPart;
-  return newString;
-}
-
-function markTileState(guess) {
-  // checks correct
-  var temp = targetWord;
-  var toReturn = [null, null, null, null, null];
-  for (var i = 0; i < 5; i++) {
-    if (guess[i] === temp[i]) {
-      toReturn[i] = state["correct"];
-      temp = replaceChar(temp, " ", i);
-      guess = replaceChar(guess, " ", i);
-    }
-  }
-
-  for (var i = 0; i < 5; i++) {
-    if (guess[i] !== " ") {
-      let index = temp.indexOf(guess[i]);
-      if (index != -1) {
-        temp = replaceChar(temp, " ", index);
-        toReturn[i] = state["location"];
-      } else {
-        toReturn[i] = state["wrong"];
-      }
-    }
-  }
-  return toReturn;
-}
-
-function handleMouseClick({ target }) {
-  target.matches("[data-key]")
-    ? pressKey(target.dataset.key)
-    : target.matches("[data-enter]")
-    ? submitGuess()
-    : null;
-}
-
-function handleKeyPress({ key }) {
-  if (sessionStorage.getItem("lang") === "heb") {
-    key === "Enter"
-      ? submitGuess()
-      : key === "Backspace"
-      ? deleteKey()
-      : key.match(/^[א-ת]$/)
-      ? pressKey(key)
-      : null;
-  } else {
-    key === "Enter"
-      ? submitGuess()
-      : key === "Backspace"
-      ? deleteKey()
-      : key.match(/^[a-zA-Z]$/)
-      ? pressKey(key)
-      : null;
-  }
-}
-
-function startInteraction() {
-  document.addEventListener("click", handleMouseClick);
-  document.addEventListener("keydown", handleKeyPress);
-}
-
-function stopInteraction() {
-  document.removeEventListener("click", handleMouseClick);
-  document.removeEventListener("keydown", handleKeyPress);
-}
-
-//! Starting the game
-startInteraction();
-
-// if (getCookie("won") === "true") {
-//   console.log("tru");
-//   stopInteraction();
-//   var date = new Date(0);
-//   date.setMilliseconds(
-//     timeInterval + Number(getCookie("date")) - new Date().getTime()
-//   ); // specify value for SECONDS here
-//   console.log(date)
-//   var timeString = date.toISOString().substring(11, 19);
-//   console.log(timeString);
-//   showAlert(
-//     "You already won! Please come back in " + timeString + " to play again",
-//     200000
-//   );
-// }
