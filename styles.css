@@ -253,7 +253,12 @@ body {
 .mobile{
   display: none;
 }
-
+.eng{
+  display: grid;
+}
+.hebrew{
+  display: none;
+}
 @media screen and (max-width: 600px) {
   .web {
     display: none;
@@ -275,6 +280,5 @@ body {
     justify-content: flex-end;
     width: 375px;
     max-width: 100vw;
-
   }
 }
