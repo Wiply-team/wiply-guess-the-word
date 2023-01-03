@@ -1,6 +1,8 @@
 //! Imports
 import { englishDictionary } from "./assets/dictionary.js";
 import { englishTargetWords } from "./assets/targetWords.js";
+import { hebrewDictionary } from "./assets/dictionaryHeb.js";
+import { hebrewTargetWords } from "./assets/targetWordsHeb.js";
 // import { spanishDictionary } from "./assets/dictionarySpanish";
 // import { spanishTargetWords } from "./assets/targetWordsSpanish";
 
@@ -31,8 +33,10 @@ let playerAttempts = 0;
 let dictionary = englishDictionary;
 let outOfScore = 4;
 let score = 0;
+let language;
 var today = new Date();
-var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+var time =
+  today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
 function getDifferenceInMinutes(date1, date2) {
   const diffInMs = Math.abs(date2 - date1);
   return diffInMs / (1000 * 60);
@@ -52,8 +56,26 @@ window.addEventListener("message", (e) => {
     if (message.type === "GAME_OPTIONS") {
       const gameOptions = message.data;
 
-      //  be cautious when updating css style rules on styles.css page as we need to update indices below appropriately if new styles (class names) are added
+      //lang
+      if (gameOptions?.language === "heb") {
+        sessionStorage.setItem("lang", gameOptions?.language);
+        document.styleSheets[0].cssRules[29].style.setProperty(
+          "display",
+          "none"
+          );          
+          document.styleSheets[0].cssRules[30].style.setProperty(
+            "display",
+          "flex"
+          );
+        document.styleSheets[0].cssRules[10].style.setProperty(
+          "direction",
+          "rtl"
+          );
+      } else {
+        sessionStorage.removeItem("lang");
+      }
 
+      //  be cautious when updating css style rules on styles.css page as we need to update indices below appropriately if new styles (class names) are added
       let numTilesToAdd;
       // keyobard property colors
       document.styleSheets[0].cssRules[4].style.setProperty(
@@ -135,7 +157,7 @@ window.addEventListener("message", (e) => {
           "grid-template-columns",
           "repeat(5, 3em)"
         );
-        console.log(numTilesToAdd)
+        console.log(numTilesToAdd);
 
         // adjusts tile size on easy mode since they're 8 rows taking up more space and being played on a mobile device
         // cssRules[27] is a media query selector and we're accessing the cssRules or that object and set the right property to make it look nice on mobile devices
@@ -149,7 +171,7 @@ window.addEventListener("message", (e) => {
         );
       }
       const grid = document.getElementsByClassName("guess-grid")[0];
-      console.log(numTilesToAdd)
+      console.log(numTilesToAdd);
       for (var i = 0; i < numTilesToAdd; i++) {
         const tile = document.createElement("div");
         tile.classList.add("tile");
@@ -176,32 +198,43 @@ function getCookie(cname) {
   }
   return "";
 }
-
-if (getCookie("date") == "" && getCookie("index") == "") {
-  document.cookie = "date=" + new Date().getTime();
-  randomIndex = Math.floor(Math.random() * englishTargetWords.length);
-  document.cookie = "index=" + randomIndex;
+if (sessionStorage.getItem("lang") === "heb") {
+  targetWord =
+    hebrewTargetWords[Math.floor(Math.random() * hebrewTargetWords.length)];
+  dictionary = hebrewDictionary;
+  window.setInterval(() => {
+    randomIndex = Math.floor(Math.random() * hebrewTargetWords.length);
+    targetWord = hebrewTargetWords[randomIndex];
+  }, timeInterval);
 } else {
-  if (new Date().getTime() > timeInterval + Number(getCookie("date"))) {
+  if (getCookie("date") == "" && getCookie("index") == "") {
     document.cookie = "date=" + new Date().getTime();
     randomIndex = Math.floor(Math.random() * englishTargetWords.length);
     document.cookie = "index=" + randomIndex;
   } else {
-    if (getCookie("index") == "") {
+    if (new Date().getTime() > timeInterval + Number(getCookie("date"))) {
+      document.cookie = "date=" + new Date().getTime();
       randomIndex = Math.floor(Math.random() * englishTargetWords.length);
       document.cookie = "index=" + randomIndex;
     } else {
-      randomIndex = Number(getCookie("index"));
+      if (getCookie("index") == "") {
+        randomIndex = Math.floor(Math.random() * englishTargetWords.length);
+        document.cookie = "index=" + randomIndex;
+      } else {
+        randomIndex = Number(getCookie("index"));
+      }
     }
   }
-}
-targetWord = englishTargetWords[randomIndex];
-
-window.setInterval(() => {
-  randomIndex = Math.floor(Math.random() * englishTargetWords.length);
   targetWord = englishTargetWords[randomIndex];
-}, timeInterval);
-
+  window.setInterval(() => {
+    randomIndex = Math.floor(Math.random() * englishTargetWords.length);
+    targetWord = englishTargetWords[randomIndex];
+  }, timeInterval);
+}
+sessionStorage.setItem(
+  "gsdjgsj",
+  "gdss542gsdav2379bfsyn9fsndsds0" + targetWord + "0jnosahgiuaoshgiauasg"
+);
 const getActiveTiles = () =>
   guessGrid.querySelectorAll('[data-state="active"]');
 
@@ -242,14 +275,14 @@ const showAlert = (message, duration = 1000) => {
 const checkWinLose = (guess, tiles) => {
   if (guess === targetWord) {
     var today2 = new Date();
-    var minutes = getDifferenceInMinutes(today,today2)
-    var seconds = getDifferenceInSeconds(today,today2)
+    var minutes = getDifferenceInMinutes(today, today2);
+    var seconds = getDifferenceInSeconds(today, today2);
     if (minutes > 0) {
-      const temp = minutes*30 + seconds * 2 + outOfScore*2 ;
-      score = 10000-temp
-    }else {
-     const temp = secodes*3 + outOfScore*2;
-     score = 10000 - temp;
+      const temp = minutes * 30 + seconds * 2 + outOfScore * 2;
+      score = 10000 - temp;
+    } else {
+      const temp = secodes * 3 + outOfScore * 2;
+      score = 10000 - temp;
     }
     window.onGameWon(Math.trunc(score));
     document.cookie = "won=true";
@@ -287,6 +320,7 @@ const deleteKey = () => {
 };
 
 document.getElementById("deleteKey").addEventListener("click", deleteKey, true);
+// document.getElementById("deleteKeyheb").addEventListener("click", deleteKey, true);
 
 const flipTile = async (tile, index, array, guess, tileState) => {
   const letter = tile.dataset.letter;
@@ -344,7 +378,11 @@ const flipTile = async (tile, index, array, guess, tileState) => {
 const submitGuess = async () => {
   const activeTiles = [...getActiveTiles()];
   if (activeTiles.length !== WORD_LENGTH) {
-    showAlert("Not enough letters");
+    if (sessionStorage.getItem("lang") === "heb") {
+      showAlert("אין מספיק תווים");
+    } else {
+      showAlert("Not enough letters");
+    }
     await shakeTiles(activeTiles);
     return;
   }
@@ -355,7 +393,11 @@ const submitGuess = async () => {
   );
 
   if (!dictionary.includes(guess)) {
-    showAlert("Word doesn't exist");
+    if (sessionStorage.getItem("lang") === "heb") {
+      showAlert("המילה לא קיימת");
+    } else {
+      showAlert("Word doesn't exist");
+    }
     await shakeTiles(activeTiles);
     return;
   }
@@ -421,13 +463,23 @@ function handleMouseClick({ target }) {
 }
 
 function handleKeyPress({ key }) {
-  key === "Enter"
-    ? submitGuess()
-    : key === "Backspace"
-    ? deleteKey()
-    : key.match(/^[a-zA-Z]$/)
-    ? pressKey(key)
-    : null;
+  if (sessionStorage.getItem("lang") === "heb") {
+    key === "Enter"
+      ? submitGuess()
+      : key === "Backspace"
+      ? deleteKey()
+      : key.match(/^[א-ת]$/)
+      ? pressKey(key)
+      : null;
+  } else {
+    key === "Enter"
+      ? submitGuess()
+      : key === "Backspace"
+      ? deleteKey()
+      : key.match(/^[a-zA-Z]$/)
+      ? pressKey(key)
+      : null;
+  }
 }
 
 function startInteraction() {
