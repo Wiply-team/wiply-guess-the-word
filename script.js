@@ -114,6 +114,7 @@ window.addEventListener("message", (e) => {
       ); // correct guess-grid
       document.getElementById("title").innerText = gameOptions?.title 
 
+
       // if (gameOptions.language === "spanish") {
       //    targetWord = spanishTargetWords[Math.floor(dayOffset)]; // changes the target word every day
       //    dictionary = spanishDictionary;
