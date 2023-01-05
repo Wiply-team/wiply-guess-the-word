@@ -229,7 +229,7 @@ window.addEventListener("message", (e) => {
       }
       sessionStorage.setItem(
         "gsdjgsj",
-        "gdss542gsdav2379bfsyn9fsndsds0" + targetWord + "0jnosahgiuaoshgiauasg"
+        "gdssנגדנדג542נדגgsdaנגדv2נדג379bfsynג9נגדfsndsds0נד" + targetWord + "0jnosaנגדhgiuaדגנגדנoshgiauasg"
       );
 
       const getActiveTiles = () =>

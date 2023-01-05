@@ -1,4 +1,5 @@
 export const hebrewDictionary = [
+  "שיראל",
   "ניאבק",
   "יישרם",
   "הפרעה",
