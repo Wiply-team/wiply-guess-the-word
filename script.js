@@ -46,7 +46,17 @@ function getDifferenceInSeconds(date1, date2) {
   return diffInMs / 1000;
 }
 
-window.onGameLoaded();
+function gameLoaded() {
+  var executed = false;
+  return function() {
+    if (!executed) {
+      executed = true;
+      window.onGameLoaded();
+    }
+  }
+}
+
+gameLoaded();
 
 window.parent.postMessage(JSON.stringify({ type: "REQUEST_OPTIONS" }), "*");
 
