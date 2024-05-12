@@ -46,7 +46,6 @@ function getDifferenceInSeconds(date1, date2) {
   return diffInMs / 1000;
 }
 
-
 window.parent.postMessage(JSON.stringify({ type: "REQUEST_OPTIONS" }), "*");
 
 window.addEventListener("message", (e) => {
@@ -111,8 +110,7 @@ window.addEventListener("message", (e) => {
         "background",
         gameOptions.correctTileColor
       ); // correct guess-grid
-      document.getElementById("title").innerText = gameOptions?.title 
-
+      document.getElementById("title").innerText = gameOptions?.title;
 
       // if (gameOptions.language === "spanish") {
       //    targetWord = spanishTargetWords[Math.floor(dayOffset)]; // changes the target word every day
@@ -226,9 +224,18 @@ window.addEventListener("message", (e) => {
           targetWord = englishTargetWords[randomIndex];
         }, timeInterval);
       }
+
+      if (gameOptions?.customWords?.length > 0) {
+        randomIndex = Math.floor(Math.random() * gameOptions?.customWords?.length );
+
+        targetWord = gameOptions?.customWords[randomIndex];
+      }
+
       sessionStorage.setItem(
         "gsdjgsj",
-        "gdssנגדנדג542נדגgsdaנגדv2נדג379bfsynג9נגדfsndsds0נד" + targetWord + "0jnosaנגדhgiuaדגנגדנoshgiauasg"
+        "gdssנגדנדג542נדגgsdaנגדv2נדג379bfsynג9נגדfsndsds0נד" +
+          targetWord +
+          "0jnosaנגדhgiuaדגנגדנoshgiauasg"
       );
 
       const getActiveTiles = () =>
