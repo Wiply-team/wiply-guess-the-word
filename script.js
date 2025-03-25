@@ -135,10 +135,37 @@ window.addEventListener("message", (e) => {
         timeInterval = 2.88 * 10 ** 7;
       }
 
+
+      if (gameOptions.difficulty === 'hard') {
+
+        document.styleSheets[0].cssRules[10].style.setProperty(
+          "grid-template-rows",
+          "repeat(4, 4em)", "important"
+
+        )
+        document.styleSheets[0].cssRules[10].style.setProperty(
+          "grid-template-columns",
+          "repeat(5, 4em)", "important"
+
+        )
+      } 
+
+
+
       // difficulty gameOptions
-      if (gameOptions.difficulty === "normal") {
+      else if (gameOptions.difficulty === "medium") {
         numTilesToAdd = 10;
         outOfScore = 6;
+        document.styleSheets[0].cssRules[10].style.setProperty(
+          "grid-template-rows",
+          "repeat(6, 4em)", "important"
+
+        )
+        document.styleSheets[0].cssRules[10].style.setProperty(
+          "grid-template-columns",
+          "repeat(5, 4em)", "important"
+
+        )
       } else if (gameOptions.difficulty === "easy") {
         numTilesToAdd = 20;
         outOfScore = 8;
@@ -190,7 +217,7 @@ window.addEventListener("message", (e) => {
       if (gameOptions?.language === "heb") {
         targetWord =
           hebrewTargetWords[
-            Math.floor(Math.random() * hebrewTargetWords.length)
+          Math.floor(Math.random() * hebrewTargetWords.length)
           ];
         dictionary = hebrewDictionary;
         window.setInterval(() => {
@@ -226,7 +253,7 @@ window.addEventListener("message", (e) => {
       }
 
       if (gameOptions?.customWords?.length > 0) {
-        randomIndex = Math.floor(Math.random() * gameOptions?.customWords?.length );
+        randomIndex = Math.floor(Math.random() * gameOptions?.customWords?.length);
 
         targetWord = gameOptions?.customWords[randomIndex];
       }
@@ -234,8 +261,8 @@ window.addEventListener("message", (e) => {
       sessionStorage.setItem(
         "gsdjgsj",
         "gdssנגדנדג542נדגgsdaנגדv2נדג379bfsynג9נגדfsndsds0נד" +
-          targetWord +
-          "0jnosaנגדhgiuaדגנגדנoshgiauasg"
+        targetWord +
+        "0jnosaנגדhgiuaדגנגדנoshgiauasg"
       );
 
       const getActiveTiles = () =>
@@ -465,8 +492,8 @@ window.addEventListener("message", (e) => {
         target.matches("[data-key]")
           ? pressKey(target.dataset.key)
           : target.matches("[data-enter]")
-          ? submitGuess()
-          : null;
+            ? submitGuess()
+            : null;
       }
 
       function handleKeyPress({ key }) {
@@ -474,18 +501,18 @@ window.addEventListener("message", (e) => {
           key === "Enter"
             ? submitGuess()
             : key === "Backspace"
-            ? deleteKey()
-            : key.match(/^[א-ת]$/)
-            ? pressKey(key)
-            : null;
+              ? deleteKey()
+              : key.match(/^[א-ת]$/)
+                ? pressKey(key)
+                : null;
         } else {
           key === "Enter"
             ? submitGuess()
             : key === "Backspace"
-            ? deleteKey()
-            : key.match(/^[a-zA-Z]$/)
-            ? pressKey(key)
-            : null;
+              ? deleteKey()
+              : key.match(/^[a-zA-Z]$/)
+                ? pressKey(key)
+                : null;
         }
       }
 
@@ -521,5 +548,5 @@ window.addEventListener("message", (e) => {
 
       return;
     }
-  } catch (error) {}
+  } catch (error) { }
 });
