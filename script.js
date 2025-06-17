@@ -10,6 +10,48 @@ import { hebrewTargetWords } from "./assets/targetWordsHeb.js";
 const WORD_LENGTH = 5;
 const FLIP_ANIMATION_DURATION = 500;
 const DANCE_ANIMATION_DURATION = FLIP_ANIMATION_DURATION;
+
+// Hebrew final letter mappings
+const HEBREW_FINAL_LETTERS = {
+  'פ': 'ף',
+  'כ': 'ך',
+  'מ': 'ם',
+  'נ': 'ן',
+  'צ': 'ץ'
+};
+
+const HEBREW_REGULAR_LETTERS = {
+  'ף': 'פ',
+  'ך': 'כ',
+  'ם': 'מ',
+  'ן': 'נ',
+  'ץ': 'צ'
+};
+
+// Function to convert regular letters to final form when at end of word
+function convertToFinalForm(word) {
+  if (!word) return word;
+  
+  // Check if the last letter has a final form
+  const lastChar = word[word.length - 1];
+  if (HEBREW_FINAL_LETTERS[lastChar]) {
+    return word.slice(0, -1) + HEBREW_FINAL_LETTERS[lastChar];
+  }
+  return word;
+}
+
+// Function to convert final letters back to regular form
+function convertToRegularForm(word) {
+  if (!word) return word;
+  
+  let result = '';
+  for (let i = 0; i < word.length; i++) {
+    const char = word[i];
+    result += HEBREW_REGULAR_LETTERS[char] || char;
+  }
+  return result;
+}
+
 //! DOM elements
 const keyboard = document.querySelector("[data-keyboard]");
 const alertContainer = document.querySelector("[data-alert-container]");
@@ -337,8 +379,11 @@ window.addEventListener("message", (e) => {
         const activeTiles = getActiveTiles();
         if (activeTiles.length >= WORD_LENGTH) return;
         const nextTile = guessGrid.querySelector(":not([data-letter])");
-        nextTile.dataset.letter = key.toLowerCase();
-        nextTile.textContent = key;
+        
+        // Convert to regular form when typing
+        const regularKey = HEBREW_REGULAR_LETTERS[key] || key;
+        nextTile.dataset.letter = regularKey.toLowerCase();
+        nextTile.textContent = regularKey;
         nextTile.dataset.state = "active";
       };
 
@@ -426,7 +471,10 @@ window.addEventListener("message", (e) => {
           ""
         );
 
-        if (!dictionary.includes(guess)) {
+        // Convert to final form for dictionary check
+        const finalFormGuess = convertToFinalForm(guess);
+        
+        if (!dictionary.includes(finalFormGuess)) {
           if (gameOptions?.language === "heb") {
             showAlert("המילה לא קיימת");
           } else {
@@ -438,10 +486,11 @@ window.addEventListener("message", (e) => {
 
         stopInteraction();
 
-        const result = markTileState(guess);
-        console.log(activeTiles);
+        // Convert target word to regular form for comparison
+        const regularTargetWord = convertToRegularForm(targetWord);
+        const result = markTileState(guess, regularTargetWord);
+        
         var i = 0;
-        console.log(result);
         activeTiles.forEach((...params) => {
           flipTile(...params, guess, result[i]);
           i++;
@@ -462,12 +511,16 @@ window.addEventListener("message", (e) => {
         return newString;
       }
 
-      function markTileState(guess) {
-        // checks correct
-        var temp = targetWord;
+      function markTileState(guess, targetWord) {
+        // Convert both words to regular form for comparison
+        const regularGuess = convertToRegularForm(guess);
+        const regularTarget = convertToRegularForm(targetWord);
+        
+        var temp = regularTarget;
         var toReturn = [null, null, null, null, null];
+        
         for (var i = 0; i < 5; i++) {
-          if (guess[i] === temp[i]) {
+          if (regularGuess[i] === temp[i]) {
             toReturn[i] = state["correct"];
             temp = replaceChar(temp, " ", i);
             guess = replaceChar(guess, " ", i);

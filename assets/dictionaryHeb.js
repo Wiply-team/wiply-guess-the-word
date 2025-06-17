@@ -69468,4 +69468,5 @@ export const hebrewDictionary = [
   "ריברו",
   "סקוטי",
   "מאייר",
+  "לשרוף"
 ];
