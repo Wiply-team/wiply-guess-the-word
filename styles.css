@@ -219,6 +219,8 @@ body {
   opacity: 0;
 }
 
+
+
 @media screen and (max-width: 600px) {
   .guess-grid {
     flex-grow: 0.1;
@@ -273,6 +275,9 @@ body {
   .key.xlarge {
     grid-column: span 6;
   }
+  .key.xxlarge {
+    grid-column: span 7;
+  }
   .key{
     font-size: 13px;
   }
@@ -295,4 +300,13 @@ h1#title {
 
 .keyboard.hebrew .hide-in-hebrew {
   display: none;
+}
+
+@media screen and (min-width: 601px) {
+  .space{
+    display: none;
+  }
+  button#deleteKey {
+    grid-column: span 7;
+}
 }
